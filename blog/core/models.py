@@ -1,0 +1,84 @@
+import pymysql.cursors
+from datetime import datetime
+
+# Connect to the database
+connection = pymysql.connect(host='localhost',
+                             user='root',
+                             password='123',
+                             db='blogs_project',
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
+
+def create_blog_table():
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = """create table if not exists blogs(
+            id int(11) unsigned AUTO_INCREMENT PRIMARY KEY,
+            title varchar(255) NOT NULL,
+            description text NOT NULL,
+            owner_name varchar(50) NOT NULL,
+            image varchar(500),
+            created_at datetime NOT NULL,
+            is_published tinyint(1) default 1
+            ); 
+            """
+        cursor.execute(sql)
+    connection.commit()
+
+def create_blog(title, description, owner_name, image, is_published=True):
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = """insert into blogs_project.blogs(title, description, owner_name, image, created_at, is_published)
+            values(%s, %s, %s, %s, %s, %s) 
+            """
+        now = datetime.now()
+        created_ad = now.strftime('%Y-%m-%d %H:%M:%S')
+        cursor.execute(sql, (title, description, owner_name, image, created_ad, is_published))
+    connection.commit()
+
+def all_blogs():
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = """select * from blogs_project.blogs;"""
+        cursor.execute(sql,)
+    return cursor.fetchall()
+
+def sql_blog_detail(blog_id):
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = """select * from blogs_project.blogs where id=%s;"""
+        cursor.execute(sql,blog_id)
+    return cursor.fetchone()
+
+def update_blog_sql(title,description,owner_name,blog_id):
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = """Update blogs_project.blogs Set title=%s , description=%s , owner_name=%s where id=%s"""
+        time = datetime.now()
+        create_at = time.strftime('%Y-%m-%d %H:%m:%s')
+        cursor.execute(sql,(title,description,owner_name,blog_id))
+    connection.commit()
+    return cursor.fetchone()
+
+def delete_blog_sql(blog_id):
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = """delete from blogs_project.blogs where id=%s"""
+        cursor.execute(sql, blog_id)
+    connection.commit()
+
+
+    return cursor.fetchone()
+
+
+def search_data(keyword):
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = """SELECT * from blogs_project.blogs WHERE title LIKE %s"""
+        cursor.execute(sql, ("%" + keyword + "%"))
+
+    return cursor.fetchall()
+
+
+
+create_blog_table()
