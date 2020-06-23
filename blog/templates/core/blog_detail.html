@@ -8,6 +8,8 @@
 
 </head>
 <body>
+  <div class="row">
+    <div class="col-8">
     <div class="card mb-4">
         <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">
         <div class="card-body">
@@ -26,7 +28,7 @@
       </div>
 
       <!-- Button trigger modal -->
->
+
   
   <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -48,7 +50,12 @@
       </div>
     </div>
   </div>
-      {% include 'includes/sidebar.html' %}
+</div>
+  <div class="col-4">
+    {% include 'includes/sidebar.html' %}
+  </div>
+</div>
+      
 
       <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

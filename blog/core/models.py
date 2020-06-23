@@ -25,7 +25,7 @@ def create_blog_table():
         cursor.execute(sql)
     connection.commit()
 
-def create_blog(title, description, owner_name, image, is_published=True):
+def create_blog(title, description, owner_name, image, is_published=True ,**kwargs):
     with connection.cursor() as cursor:
         # Create a new record
         sql = """insert into blogs_project.blogs(title, description, owner_name, image, created_at, is_published)
@@ -39,7 +39,7 @@ def create_blog(title, description, owner_name, image, is_published=True):
 def all_blogs():
     with connection.cursor() as cursor:
         # Create a new record
-        sql = """select * from blogs_project.blogs;"""
+        sql = """select * from blogs_project.blogs order by created_at desc;"""
         cursor.execute(sql,)
     return cursor.fetchall()
 
@@ -50,7 +50,7 @@ def sql_blog_detail(blog_id):
         cursor.execute(sql,blog_id)
     return cursor.fetchone()
 
-def update_blog_sql(title,description,owner_name,blog_id):
+def update_blog_sql(title,description,owner_name,blog_id,**kwargs):
     with connection.cursor() as cursor:
         # Create a new record
         sql = """Update blogs_project.blogs Set title=%s , description=%s , owner_name=%s where id=%s"""
@@ -78,6 +78,8 @@ def search_data(keyword):
         cursor.execute(sql, ("%" + keyword + "%"))
 
     return cursor.fetchall()
+
+
 
 
 

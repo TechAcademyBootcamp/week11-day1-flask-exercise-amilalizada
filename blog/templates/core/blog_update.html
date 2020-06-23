@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% from "helpers/blog_formhelpers.html" import render_field %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,19 +14,17 @@
             <div class="col-md-8">
 
         <form action="" method="post">
+            {{ form.csrf_token }}
             <div class="form-group">
-                <label >Title</label>
-                <input value="{{blog.title}}" class="form-control" type="text" name="title">
+                {{render_field(form.title)}}
             </div>
 
             <div class="form-group">
-                <label >Description</label>
-                <textarea value="{{blog.description}}" class="form-control" name="description" id="" cols="30" rows="10"></textarea>
+                {{render_field(form.description)}}
             </div>
 
             <div class="form-group">
-                <label >Owner name</label>
-                <input value="{{blog.owner_name}}" class="form-control" type="text" name="owner_name">
+                {{render_field(form.owner_name)}}
 
             </div>
 
