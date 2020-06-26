@@ -1,5 +1,6 @@
 import pymysql.cursors
 from datetime import datetime
+from blog.auth.models import create_blog_table
 
 # Connect to the database
 connection = pymysql.connect(host='localhost',
@@ -18,22 +19,25 @@ def create_blog_table():
             description text NOT NULL,
             owner_name varchar(50) NOT NULL,
             image varchar(500),
+            auth_id int(11) unsigned NOT NULL , 
             created_at datetime NOT NULL,
-            is_published tinyint(1) default 1
+            is_published tinyint(1) default 1 ,
+            FOREIGN KEY (auth_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+            INDEX(id , title)
             ); 
             """
         cursor.execute(sql)
     connection.commit()
 
-def create_blog(title, description, owner_name, image, is_published=True ,**kwargs):
+def create_blog(title, description, owner_name, image,auth_id, is_published=True ,**kwargs):
     with connection.cursor() as cursor:
         # Create a new record
-        sql = """insert into blogs_project.blogs(title, description, owner_name, image, created_at, is_published)
-            values(%s, %s, %s, %s, %s, %s) 
+        sql = """insert into blogs_project.blogs(title, description, owner_name, image, created_at, is_published ,auth_id )
+            values(%s, %s, %s, %s, %s, %s, %s) 
             """
         now = datetime.now()
         created_ad = now.strftime('%Y-%m-%d %H:%M:%S')
-        cursor.execute(sql, (title, description, owner_name, image, created_ad, is_published))
+        cursor.execute(sql, (title, description, owner_name, image, created_ad, is_published,auth_id))
     connection.commit()
 
 def all_blogs():

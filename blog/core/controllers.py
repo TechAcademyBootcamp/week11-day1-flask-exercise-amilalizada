@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, flash
+from flask import Blueprint, render_template, request, redirect, flash ,session
 from blog.core.models import create_blog, all_blogs ,sql_blog_detail , update_blog_sql , search_data , delete_blog_sql
 from blog.core.forms import BlogForm
+from blog.core.utils import login_required
 core = Blueprint(__name__, 'core', static_url_path='idris/')
 
 @core.route('/')
@@ -19,11 +20,16 @@ def home():
     return render_template('core/index.html', **context)
 
 @core.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
+    if not session.get('loginned'):
+        
+        return redirect('/login')
     form = BlogForm()
     if form.validate_on_submit():
         print(form.data)
-        create_blog(**form.data, image='')
+        create_blog(**form.data, image='', auth_id=session.get('user_id'))
+        redirect('/')
 
     context = {
         'form': form
@@ -31,6 +37,7 @@ def create():
     return render_template('core/create.html', **context)
 
 @core.route('/blog/<int:id_blog>')
+@login_required
 def blog_detail(id_blog):
     blog = sql_blog_detail(id_blog)
     context = {
@@ -39,6 +46,7 @@ def blog_detail(id_blog):
     return render_template('core/blog_detail.html',**context)
 
 @core.route('/update/<int:id_blog>' , methods = ['GET' , 'POST'])
+@login_required
 def update_blog(id_blog):
 
     if request.method == 'POST':
@@ -58,6 +66,7 @@ def update_blog(id_blog):
     return render_template('core/blog_update.html' , **context)
 
 @core.route('/delete/<int:id_blog>')
+
 def delete(id_blog):
     blog = delete_blog_sql(id_blog)
     flash('deleted')
