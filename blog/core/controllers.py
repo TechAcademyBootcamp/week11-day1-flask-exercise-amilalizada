@@ -1,76 +1,60 @@
-from flask import Blueprint, render_template, request, redirect, flash ,session
-from blog.core.models import create_blog, all_blogs ,sql_blog_detail , update_blog_sql , search_data , delete_blog_sql
-from blog.core.forms import BlogForm
-from blog.core.utils import login_required
+from flask import Blueprint, render_template, request, redirect, flash, send_from_directory
+from flask_login import login_required, current_user
+from blog import db
+from blog.core.models import Contact, Blog
+from blog.core.utils import save_file
+import math
 core = Blueprint(__name__, 'core', static_url_path='idris/')
 
 @core.route('/')
 def home():
-    print(request.args.get('search'))
-    word = request.args.get('search')
- 
-    if word:
-        blogs_var = search_data(word)
-    else:
-        blogs_var = all_blogs()
-    context = {
-        'blogs_all': blogs_var
-    }
-    
-    return render_template('core/index.html', **context)
+    page = int(request.args.get('page', 1))
+    print(page)
+    blogs = Blog.query.filter_by().order_by(Blog.created_at.desc()).limit(2).offset((page-1)*2)
+    print(blogs)
+    page_count = math.ceil(Blog.query.filter_by().count()/2)
+    page_range = range(1, page_count+1)
+    next_page = None
+    previous_page = None
 
-@core.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    if not session.get('loginned'):
-        
-        return redirect('/login')
     form = BlogForm()
-    if form.validate_on_submit():
-        print(form.data)
-        create_blog(**form.data, image='', auth_id=session.get('user_id'))
-        redirect('/')
-
+    if request.method == 'POST' and form.validate_on_submit():
+        f = form.image.data
+        file_path = save_file(f)
+        blog = Blog(title=form.title.data, description=form.description.data, image=file_path, user_id=current_user.id)
+        db.session.add(blog)
+        db.session.commit()
+        flash('Melumat elave edildi')
+        return redirect('/')
     context = {
         'form': form
     }
     return render_template('core/create.html', **context)
 
-@core.route('/blog/<int:id_blog>')
-@login_required
-def blog_detail(id_blog):
-    blog = sql_blog_detail(id_blog)
+@core.route('/contact', methods=['GET', 'POST'])
+def contact():
+    form = ContactForm()
+    if form.validate_on_submit():
+        contact_info = Contact(username=form.username.data, email=form.email.data, subject=form.subject.data, message=form.message.data)
+        db.session.add(contact_info)
+        db.session.commit()
+        flash('Mesajiniz gonderildi')
+        return redirect('/')
     context = {
-        'blog':blog
+        'form': form
     }
-    return render_template('core/blog_detail.html',**context)
-
-@core.route('/update/<int:id_blog>' , methods = ['GET' , 'POST'])
-@login_required
-def update_blog(id_blog):
-
-    if request.method == 'POST':
-        form = BlogForm()
-        print(form.data)
-        if form.validate_on_submit():
-            print(form.data)
-            update_blog_sql(**form.data,blog_id=id_blog)
-            flash('succesfully updated')
-            return redirect(f'/blog/{id_blog}')
-    else:
-        blog = sql_blog_detail(id_blog)
-        form = BlogForm(data=blog)
+    return render_template('core/contact.html', **context)
+@core.route('/faqs')
+def faqs():
+    questions = Contact.query.all()
+    print(questions)
     context = {
-        'form':form
+        'questions': questions
     }
-    return render_template('core/blog_update.html' , **context)
+    return render_template('core/faqs.html', **context)
 
-@core.route('/delete/<int:id_blog>')
-
-def delete(id_blog):
-    blog = delete_blog_sql(id_blog)
-    flash('deleted')
-    return redirect('/')
 
 
 

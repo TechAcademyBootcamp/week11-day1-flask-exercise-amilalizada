@@ -24,7 +24,7 @@
           Posted on {{blog.created_at.strftime('%B %d, %Y')}} by
           <a href="#">{{blog.owner_name}}</a>
         </div>
-        {% if session.user_id==blog.auth_id %}
+        {% if blog.user.id==current.useri.id %}
         <a href="/update/{{blog.id}}" class="btn btn-primary">update &rarr;</a>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
           Delete &rarr;
